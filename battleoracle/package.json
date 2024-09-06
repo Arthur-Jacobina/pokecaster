@@ -8,6 +8,8 @@
     "deploy": "vercel"
   },
   "dependencies": {
+    "@hono/node-server": "latest",
+    "@xmtp/frames-validator": "^0.6.0",
     "frog": "latest",
     "hono": "^4"
   },
