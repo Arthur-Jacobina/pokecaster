@@ -49,8 +49,8 @@ app.frame("/", (c) => {
   const fruit = inputText || buttonValue;
 
   // XMTP verified address
-  const { verifiedWalletAddress } = c?.var || {};
-  console.log("verifiedWalletAddress", verifiedWalletAddress);
+  // const { verifiedWalletAddress } = c?.var || {};
+  // console.log("verifiedWalletAddress", verifiedWalletAddress);
   console.log('banana')
   return c.res({
     image: (
