@@ -12,12 +12,12 @@ run(async (context: HandlerContext) => {
     } 
     
     // TBD
-    if (text === "/battle create") {
+    else if (text === "/battle create") {
       await context.send(`https://edpon-frames.vercel.app/api`);
     } 
 
     // TBD
-    if (text === "/battle get") {
+    else if (text === "/battle get") {
       await context.send(`https://edpon-frames.vercel.app/api`);
     } 
 
@@ -29,7 +29,7 @@ run(async (context: HandlerContext) => {
       await context.send(`/battle create -> creates a new battle`);
     } 
     
-    // fallback in caso of unexpected text
+    // fallback in caso of unexpected text (text !== "/battle" || text !== "/help" || text !== "/battle get" || text !== "/battle create")
     else {
       await context.reply(`🔴 Greetings! I'm the Battle Oracle, a bot to facilitate pokeframe battles 🔴`);
       await context.send(`🔎 Type /help to learn how I can help you`);
@@ -41,9 +41,9 @@ run(async (context: HandlerContext) => {
         content: { content: emoji, action },
       },
     } = context;
-    if (action === "added" && (emoji === "🔂" || emoji === "🔁")) {
-      await context.send("(:");
-    }
+    // if (action === "added" && (emoji === "🔂" || emoji === "🔁")) {
+    await context.send("Not implemented yet (:");
+    
   }
 
   // handle unexpected input
