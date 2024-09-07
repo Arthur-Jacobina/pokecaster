@@ -11,7 +11,8 @@
     "@hono/node-server": "latest",
     "@xmtp/frames-validator": "^0.6.0",
     "frog": "latest",
-    "hono": "^4"
+    "hono": "^4",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "tsx": "^4.7.1",
