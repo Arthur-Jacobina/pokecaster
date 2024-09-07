@@ -8,17 +8,17 @@ run(async (context: HandlerContext) => {
 
     // list of battles with status = "waiting"
     if (text === "/battle") {
-      await context.send(`https://edpon-frames.vercel.app/api`);
+      await context.send(`https://pokeframes-three.vercel.app/api`);
     } 
     
     // TBD
     else if (text === "/battle create") {
-      await context.send(`https://edpon-frames.vercel.app/api`);
+      await context.send(`https://pokeframes-three.vercel.app/api`);
     } 
 
     // TBD
     else if (text === "/battle get") {
-      await context.send(`https://edpon-frames.vercel.app/api`);
+      await context.send(`https://pokeframes-three.vercel.app/api`);
     } 
 
     // list of commands available + short descriptions
