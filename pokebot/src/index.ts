@@ -42,7 +42,7 @@ run(async (context: HandlerContext) => {
       },
     } = context;
     // if (action === "added" && (emoji === "🔂" || emoji === "🔁")) {
-    await context.send("Not implemented yet (:");
+    await context.send("Reactions not implemented yet (:");
     
   }
 

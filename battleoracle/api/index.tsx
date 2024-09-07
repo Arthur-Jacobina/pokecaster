@@ -1,8 +1,9 @@
 import { serveStatic } from "@hono/node-server/serve-static";
-import { Button, Frog, TextInput } from "frog";
+import { Button, Frog } from "frog";
 import { devtools } from "frog/dev";
 import { Context, Next } from 'hono';
 import { validateFramesPost } from "@xmtp/frames-validator";
+import { getBattleById, getBattleIdByStatus } from "../lib/database.js";
 
 const title = 'battle-oracle'
 
@@ -44,57 +45,31 @@ app.use(xmtpSupport);
 
 app.use("/*", serveStatic({ root: "./public" }));
 
-app.frame("/", (c) => {
-  const { buttonValue, inputText, status } = c;
-  const fruit = inputText || buttonValue;
 
   // XMTP verified address
   // const { verifiedWalletAddress } = c?.var || {};
   // console.log("verifiedWalletAddress", verifiedWalletAddress);
-  console.log('banana')
+app.frame("/", (c) => {
   return c.res({
-    image: (
-      <div
-        style={{
-          alignItems: "center",
-          background:
-            status === "response"
-              ? "linear-gradient(to right, #432889, #17101F)"
-              : "black",
-          backgroundSize: "100% 100%",
-          display: "flex",
-          flexDirection: "column",
-          flexWrap: "nowrap",
-          height: "100%",
-          justifyContent: "center",
-          textAlign: "center",
-          width: "100%",
-        }}
-      >
-        <div
-          style={{
-            color: "white",
-            fontSize: 60,
-            fontStyle: "normal",
-            letterSpacing: "-0.025em",
-            lineHeight: 1.4,
-            marginTop: 30,
-            padding: "0 120px",
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {status === "response"
-            ? `Nice choice.${fruit ? ` ${fruit.toUpperCase()}!!` : ""}`
-            : "Welcome!"}
-        </div>
-      </div>
-    ),
+    image: `${42}`,
     intents: [
-      <TextInput placeholder="Enter custom fruit..." />,
-      <Button value="apples">Apples</Button>,
-      <Button value="oranges">Oranges</Button>,
-      <Button value="bananas">Bananas</Button>,
-      status === "response" && <Button.Reset>Reset</Button.Reset>,
+      <Button value="apples">⬅️</Button>,
+      <Button value="oranges">✅</Button>,
+      <Button value="bananas">➡️</Button>,
+    ],
+  });
+});
+
+app.frame("/:id", async (c) => {
+  const id = Number(c.req.param('id'));
+  const waitingBattles = await getBattleIdByStatus('waiting');
+  const battle = getBattleById(waitingBattles[id]);
+  return c.res({
+    image: `${42}`,
+    intents: [
+      <Button action={`/${id+1}`}>⬅️</Button>,
+      <Button action={``}>✅</Button>,
+      <Button action={`/${id-1}`}>➡️</Button>,
     ],
   });
 });
