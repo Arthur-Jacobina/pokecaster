@@ -6,7 +6,6 @@ import { handle } from 'frog/vercel';
 import { serve } from '@hono/node-server';
 import { validateFramesPost } from "@xmtp/frames-validator";
 import { generateBattleList } from "../image-generation/generator.js";
-import { getBattleIdByStatus } from "../lib/database.js";
 // import { getBattleById, getBattleIdByStatus } from "../lib/database.js";
 
 const title = 'battle-oracle'
@@ -61,6 +60,7 @@ app.frame("/", async (c) => {
     intents: [
       <Button action={`/0`}>Battles</Button>,
       <Button action={`/`}>Share</Button>,
+      <Button action={`/subscribe/${"qlqrcoisa"}`}>Subscribe</Button>,
     ],
   });
 });
@@ -84,14 +84,14 @@ app.frame("/battle/:id", async (c) => {
 });
 
 app.frame("/subscribe/:username", async (c) => {
-  const username = c.req.param('username');
+  // const username = c.req.param('username');
 
   return c.res({
     title,
     image: `/bocover.png`,
     imageAspectRatio: '1:1',
     intents: [
-      <Button action={`/register/${username}`}>Sign</Button>
+      <Button action={`/register`}>Sign</Button>
     ],
   })
 })
@@ -148,23 +148,23 @@ app.signature('/sign/:username', (c) => {
   })
 })
 
-app.hono.get('/image/battlelist/:p1/:p2/:p3', async (c) => {
-  try {
-    const p1 = Number(c.req.param('p1'));
-    const p2 = Number(c.req.param('p2'));
-    const p3 = Number(c.req.param('p3'));
+// app.hono.get('/image/battlelist/:p1/:p2/:p3', async (c) => {
+//   try {
+//     const p1 = Number(c.req.param('p1'));
+//     const p2 = Number(c.req.param('p2'));
+//     const p3 = Number(c.req.param('p3'));
 
-    const image = await generateBattleList([p1,p2,p3]);
+//     const image = await generateBattleList([p1,p2,p3]);
 
-    return c.newResponse(image, 200, {
-      'Content-Type': 'image/png',
-      'Cache-Control': 'max-age=0', 
-    });
-  } catch (error) {
-    console.error("Error generating image:", error);
-    return c.newResponse("Error generating image", 500);
-  }
-});
+//     return c.newResponse(image, 200, {
+//       'Content-Type': 'image/png',
+//       'Cache-Control': 'max-age=0', 
+//     });
+//   } catch (error) {
+//     console.error("Error generating image:", error);
+//     return c.newResponse("Error generating image", 500);
+//   }
+// });
 
 if (process.env.NODE_ENV !== 'production') {
   devtools(app, { serveStatic });
