@@ -1,27 +1,33 @@
 import sharp from 'sharp'
 
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 export const generateBattleList = async (
     pokemonIds: number[],
   ) => {
     try {
     const ComponentsArray = [];
     
-    const baseImageBuffer = await sharp('./public/battle-oracle-base.png')
+    const baseImageBuffer = await sharp(join(__dirname, '../public/battle-oracle-base.png'))
     .resize(600, 600)
     .jpeg()
     .toBuffer();
   
-    const pokemon1ImageBuffer = await sharp(`./public/pokemons/${pokemonIds[0]}.png`)
+    const pokemon1ImageBuffer = await sharp(join(__dirname, `../public/pokemons/${pokemonIds[0]}.png`))
     .resize(86, 86)
     .png()
     .toBuffer();
   
-    const pokemon2ImageBuffer = await sharp(`./public/pokemons/${pokemonIds[1]}.png`)
+    const pokemon2ImageBuffer = await sharp(join(__dirname, `../public/pokemons/${pokemonIds[1]}.png`))
     .resize(86, 86)
     .png()
     .toBuffer();
   
-    const pokemon3ImageBuffer = await sharp(`./public/pokemons/${pokemonIds[2]}.png`)
+    const pokemon3ImageBuffer = await sharp(join(__dirname, `../public/pokemons/${pokemonIds[2]}.png`))
     .resize(86, 86)
     .png()
     .toBuffer();
