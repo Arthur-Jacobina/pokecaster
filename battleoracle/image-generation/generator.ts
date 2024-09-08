@@ -8,7 +8,7 @@ export const generateBattleList = async (
     
     const baseImageBuffer = await sharp('./public/battle-oracle-base.png')
     .resize(600, 600)
-    .png()
+    .jpeg()
     .toBuffer();
   
     const pokemon1ImageBuffer = await sharp(`./public/pokemons/${pokemonIds[0]}.png`)
@@ -31,7 +31,7 @@ export const generateBattleList = async (
     ComponentsArray.push({input: pokemon3ImageBuffer, top: 60, left: 397});
     const finalImage = await sharp(baseImageBuffer)
     .composite(ComponentsArray)
-    .png()
+    .jpeg()
     .toBuffer();
   
     return finalImage;

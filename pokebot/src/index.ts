@@ -31,9 +31,9 @@ run(async (context: HandlerContext) => {
           await context.send(`You are participating in the following battles:`);
           battles.forEach(async (battle: any) => {
             if(battle.canPlayerMove) {
-              await context.send(`IT'S YOUR TURN! https://pokeframes-three.vercel.app/api/battle/${battle}`);
+              await context.send(`IT'S YOUR TURN! https://pokeframes-three.vercel.app/api/battle/${battle.id}`);
             } else {
-              await context.send(`Awaiting opponent... https://pokeframes-three.vercel.app/api/battle/${battle}`);
+              await context.send(`Awaiting opponent... https://pokeframes-three.vercel.app/api/battle/${battle.id}`);
             }
           });
         }

@@ -7,6 +7,7 @@ import { serve } from '@hono/node-server';
 import { validateFramesPost } from "@xmtp/frames-validator";
 import { generateBattleList } from "../image-generation/generator.js";
 import { getBattleById, getBattleIdByStatus, registerUser } from "../lib/database.js";
+import { bufferToDataURL } from "../utils/blobToDataURL.js";
 // import { getBattleById, getBattleIdByStatus } from "../lib/database.js";
 
 const title = 'battle-oracle'
@@ -109,9 +110,14 @@ app.frame("/battle-by-id/:id", async (c) => {
   const battle = await getBattleById(id);
   const battlePokemons = battle.maker_pokemons.map((pokemon: any) => pokemon.id);
 
+  const image = await generateBattleList([battlePokemons[0],battlePokemons[1],battlePokemons[2]]);
+  const dataUrl = bufferToDataURL(image, 'image/jpeg');
+
+  console.log(dataUrl);
+
   return c.res({
     title,
-    image: `/image/battlelist/${battlePokemons[0]}/${battlePokemons[1]}/${battlePokemons[2]}`,
+    image: dataUrl,
     imageAspectRatio: '1:1',
     intents: [
       <Button action={`/battle/${id}`}>Fight</Button>,
