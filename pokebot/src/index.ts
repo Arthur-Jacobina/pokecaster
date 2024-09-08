@@ -1,5 +1,5 @@
 import { run, HandlerContext } from "@xmtp/message-kit";
-import { getFid } from "./lib/database";
+import { getFid } from "./lib/database.js";
 
 run(async (context: HandlerContext) => {
   const { message: { typeId } } = context;
@@ -7,11 +7,10 @@ run(async (context: HandlerContext) => {
   if (typeId === "text" || typeId === "reply") {
     const { message: { content: { content: text }, sender: { username } } } = context;
 
-    const userFid = await getFid(username);
+    const fid = await getFid(username);
 
-    if(userFid === null) {
-      await context.send("You need to register first. Please visit the /register frame");
-      return;
+    if(fid === null) {
+      await context.send('Go create an account!');
     }
 
     // list of battles with status = "waiting"
