@@ -9,39 +9,43 @@ run(async (context: HandlerContext) => {
 
     const fid = await getFid(username);
 
-    if(fid === null) {
-      await context.send('Go create an account!');
+    if(fid !== null) {
+      // list of battles with status = "waiting"
+      if (text === "/battle") {
+        await context.send(`https://pokeframes-three.vercel.app/api`);
+      } 
+      
+      // TBD
+      else if (text === "/battle create") {
+        await context.send(`https://pokeframes-three.vercel.app/api`);
+      } 
+  
+      // TBD
+      else if (text === "/battle get") {
+        await context.send(`https://pokeframes-three.vercel.app/api/battle/:id`);
+      } 
+  
+      // list of commands available + short descriptions
+      else if (text === "/help") {
+        await context.send(`🔎 Commands below are currently available`);
+        await context.send(`/battle -> sends a list of joinable battles`);
+        await context.send(`/battle get <id> -> get a battle by its id and play it on the chat`);
+        await context.send(`/battle create -> creates a new battle`);
+      } 
+      
+      // fallback in caso of unexpected text (text !== "/battle" || text !== "/help" || text !== "/battle get" || text !== "/battle create")
+      else {
+        await context.reply(`🔴 Greetings! I'm the Battle Oracle, a bot to facilitate pokeframe battles 🔴`);
+        await context.send(`🔎 Type /help to learn how I can help you`);
+        await context.send(`Let's battle! 🔥`);
+      }
+    } else {
+      await context.reply(`🔴 Greetings! I am the Battle Oracle, your bot guide for facilitating Pokeframe battles. 🔴`);
+      await context.send(`To participate in this game, a Warpcast account is required.`);
+      await context.send(`Please link your Converse account to Warpcast by following the link below:`);
+      await context.send(`http://pokecasterv1.vercel.app/api/subscribe/${username}`);
     }
 
-    // list of battles with status = "waiting"
-    if (text === "/battle") {
-      await context.send(`https://pokeframes-three.vercel.app/api`);
-    } 
-    
-    // TBD
-    else if (text === "/battle create") {
-      await context.send(`https://pokeframes-three.vercel.app/api`);
-    } 
-
-    // TBD
-    else if (text === "/battle get") {
-      await context.send(`https://pokeframes-three.vercel.app/api/battle/:id`);
-    } 
-
-    // list of commands available + short descriptions
-    else if (text === "/help") {
-      await context.send(`🔎 Commands below are currently available`);
-      await context.send(`/battle -> sends a list of joinable battles`);
-      await context.send(`/battle get <id> -> get a battle by its id and play it on the chat`);
-      await context.send(`/battle create -> creates a new battle`);
-    } 
-    
-    // fallback in caso of unexpected text (text !== "/battle" || text !== "/help" || text !== "/battle get" || text !== "/battle create")
-    else {
-      await context.reply(`🔴 Greetings! I'm the Battle Oracle, a bot to facilitate pokeframe battles 🔴`);
-      await context.send(`🔎 Type /help to learn how I can help you`);
-      await context.send(`Let's battle! 🔥`);
-    }
   } else if (typeId === "reaction") {
     const {
       message: {

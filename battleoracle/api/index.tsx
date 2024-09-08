@@ -6,6 +6,7 @@ import { handle } from 'frog/vercel';
 import { serve } from '@hono/node-server';
 import { validateFramesPost } from "@xmtp/frames-validator";
 import { generateBattleList } from "../image-generation/generator.js";
+import { registerUser } from "../lib/database.js";
 // import { getBattleById, getBattleIdByStatus } from "../lib/database.js";
 
 const title = 'battle-oracle'
@@ -84,87 +85,51 @@ app.frame("/battle/:id", async (c) => {
 });
 
 app.frame("/subscribe/:username", async (c) => {
-  // const username = c.req.param('username');
+  const username = c.req.param('username');
 
   return c.res({
     title,
     image: `/bocover.png`,
     imageAspectRatio: '1:1',
     intents: [
-      <Button action={`/register`}>Sign</Button>
+      <Button action={`/register/${username}`}>Sign</Button>
     ],
   })
 })
 
 app.frame("/register/:username", async (c) => {
   const username = c.req.param('username');
+  const fid = c.frameData?.fid;
+
+  await registerUser(fid!, username);
 
   return c.res({
     title,
     image: `/bocover.png`,
     imageAspectRatio: '1:1',
     intents: [
-      <Button.Signature target={`/sign/${username}`}>Sign</Button.Signature>
+      <Button>REGISTERED!</Button>
     ],
   });
 })
 
-app.frame('/finish', (c) => {
-  const { transactionId } = c
+app.hono.get('/image/battlelist/:p1/:p2/:p3', async (c) => {
+  try {
+    const p1 = Number(c.req.param('p1'));
+    const p2 = Number(c.req.param('p2'));
+    const p3 = Number(c.req.param('p3'));
 
-  return c.res({
-    image: (
-      <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
-        Signature: {transactionId}
-      </div>
-    )
-  })
-})
+    const image = await generateBattleList([p1,p2,p3]);
 
-app.signature('/sign/:username', (c) => {
-  const username = c.req.param('username');
-  const fid = c.frameData?.fid;
-
-  const timestamp = Date.now();
-  
-  return c.signTypedData({
-    chainId: 'eip155:11155111',
-    domain: {
-      name: 'Pokeframes',
-    },
-    types: {
-      Register: [
-        { name: 'fid', type: 'uint256' },
-        { name: 'username', type: 'string' },
-        { name: 'timestamp', type: 'uint256' },
-      ]
-    },
-    primaryType: 'Register',
-    message: {
-      fid: BigInt(fid!),
-      username: username,
-      timestamp: BigInt(timestamp)
-    }
-  })
-})
-
-// app.hono.get('/image/battlelist/:p1/:p2/:p3', async (c) => {
-//   try {
-//     const p1 = Number(c.req.param('p1'));
-//     const p2 = Number(c.req.param('p2'));
-//     const p3 = Number(c.req.param('p3'));
-
-//     const image = await generateBattleList([p1,p2,p3]);
-
-//     return c.newResponse(image, 200, {
-//       'Content-Type': 'image/png',
-//       'Cache-Control': 'max-age=0', 
-//     });
-//   } catch (error) {
-//     console.error("Error generating image:", error);
-//     return c.newResponse("Error generating image", 500);
-//   }
-// });
+    return c.newResponse(image, 200, {
+      'Content-Type': 'image/png',
+      'Cache-Control': 'max-age=0', 
+    });
+  } catch (error) {
+    console.error("Error generating image:", error);
+    return c.newResponse("Error generating image", 500);
+  }
+});
 
 if (process.env.NODE_ENV !== 'production') {
   devtools(app, { serveStatic });
