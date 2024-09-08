@@ -5,9 +5,9 @@ run(async (context: HandlerContext) => {
   const { message: { typeId } } = context;
   console.log(typeId);
   if (typeId === "text" || typeId === "reply") {
-    const { message: { content: { content: text }, sender: { username } } } = context;
+    const { message: { content: { content: text }, sender: { address } } } = context;
 
-    const fid = await getFid(username);
+    const fid = await getFid(address);
 
     if(fid !== null) {
       // list of battles with status = "waiting"
@@ -39,7 +39,7 @@ run(async (context: HandlerContext) => {
       await context.reply(`🔴 Greetings! I am the Battle Oracle, your bot guide for facilitating Pokeframe battles. 🔴`);
       await context.send(`To participate in this game, a Warpcast account is required.`);
       await context.send(`Please link your Converse account to Warpcast by following the link below:`);
-      await context.send(`http://pokecasterv1.vercel.app/api/subscribe/${context.message.sender.address}`);
+      await context.send(`http://pokecasterv1.vercel.app/api/subscribe/${address}`);
     }
 
   } else if (typeId === "reaction") {
