@@ -43,7 +43,7 @@ run(async (context: HandlerContext) => {
       await context.reply(`🔴 Greetings! I am the Battle Oracle, your bot guide for facilitating Pokeframe battles. 🔴`);
       await context.send(`To participate in this game, a Warpcast account is required.`);
       await context.send(`Please link your Converse account to Warpcast by following the link below:`);
-      await context.send(`http://pokecasterv1.vercel.app/api/subscribe/${username}`);
+      await context.send(`http://pokecasterv1.vercel.app/api/subscribe/${context.message.sender.address}`);
     }
 
   } else if (typeId === "reaction") {
