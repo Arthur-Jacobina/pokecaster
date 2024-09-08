@@ -24,5 +24,27 @@ export const getUserBattleFrames = async (address: string) => {
 
   const data : any = await response.json();
 
-  return data.battles as number[];
+  const battles = data.battles;
+
+  const canPlayerMove : any = [];
+
+  const fid = await getFid(address);
+
+  // for each battle, check if player is maker or taker
+  // if player is maker, check if maker_move is null
+  // if player is taker, check if taker_move is null
+
+  battles.forEach((battle: any) => {
+    if(battle.maker === null || battle.taker === null) {
+      canPlayerMove.push({id: battle.id, canPlayerMove: false});
+    } else if(battle.maker === fid && battle.maker_move === null) {
+      canPlayerMove.push({id: battle.id, canPlayerMove: true});
+    } else if(battle.taker === fid && battle.taker_move === null) {
+      canPlayerMove.push({id: battle.id, canPlayerMove: true});
+    } else {
+      canPlayerMove.push({id: battle.id, canPlayerMove: false});
+    }
+  });
+
+  return canPlayerMove;
 } 
