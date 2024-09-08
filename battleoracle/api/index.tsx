@@ -54,44 +54,70 @@ app.use("/*", serveStatic({ root: "./public" }));
   // const { verifiedWalletAddress } = c?.var || {};
   // console.log("verifiedWalletAddress", verifiedWalletAddress);
 app.frame("/", async (c) => {
-  const waitingBattles = await getBattleIdByStatus('waiting');
-  const battleId = waitingBattles[0];
-
   return c.res({
     title,
     image: `/bocover.png`,
     imageAspectRatio: '1:1',
     intents: [
-      <Button action={`/battle/${battleId}`}>Battles</Button>,
+      <Button action='/start-search'>Search battles</Button>,
     ],
   });
 });
 
-app.frame("/battle/:id", async (c) => {
-  const id = Number(c.req.param('id'));
-  const battle = await getBattleById(id);
-  const battlePokemons = battle.maker_pokemons;
+app.frame("/start-search", async (c) => {
+  return c.res({
+    title,
+    image: `/bocover.png`,
+    imageAspectRatio: '1:1',
+    intents: [
+      <Button action={`/battle/0`}>Show me</Button>,
+    ],
+  });
+})
 
+app.frame("/battle/:position", async (c) => {
   const waitingBattles = await getBattleIdByStatus('waiting');
   const totalBattles = waitingBattles.length;
+
+  const position = Number(c.req.param('position'));
+  const battle = await getBattleById(waitingBattles[position]);
+  const battlePokemons = battle.maker_pokemons.map((pokemon: any) => pokemon.id);
 
   const getNextIndex = (currentIndex: any) => (currentIndex + 1) % totalBattles;
   const getPreviousIndex = (currentIndex: any) => (currentIndex - 1 + totalBattles) % totalBattles;
 
-  const nextBattleId = waitingBattles[getNextIndex(id)];
-  const previousBattleId = waitingBattles[getPreviousIndex(id)];
+  const nextBattleId = getNextIndex(position);
+  const previousBattleId = getPreviousIndex(position);
+
+  console.log("next", nextBattleId);
+  console.log("previous", previousBattleId);
 
   return c.res({
     title,
     image: `/image/battlelist/${battlePokemons[0]}/${battlePokemons[1]}/${battlePokemons[2]}`,
     imageAspectRatio: '1:1',
     intents: [
-      <Button action={`/${nextBattleId}`}>⬅️</Button>,
-      <Button action={`/`}>✅</Button>,
-      <Button action={`/${previousBattleId}`}>➡️</Button>,
+      <Button action={`/battle/${previousBattleId}`}>⬅️</Button>,
+      <Button.Link href={`https://pokeframes-three.vercel.app/api/battle/share/${waitingBattles[position]}`}>✅</Button.Link>,
+      <Button action={`/battle/${nextBattleId}`}>➡️</Button>,
     ],
   });
 });
+
+app.frame("/battle-by-id/:id", async (c) => {
+  const id = Number(c.req.param('id'));
+  const battle = await getBattleById(id);
+  const battlePokemons = battle.maker_pokemons.map((pokemon: any) => pokemon.id);
+
+  return c.res({
+    title,
+    image: `/image/battlelist/${battlePokemons[0]}/${battlePokemons[1]}/${battlePokemons[2]}`,
+    imageAspectRatio: '1:1',
+    intents: [
+      <Button action={`/battle/${id}`}>Fight</Button>,
+    ],
+  });
+})
 
 app.frame("/subscribe/:wallet", async (c) => {
   const wallet = c.req.param('wallet');

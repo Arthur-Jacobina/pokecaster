@@ -1,5 +1,5 @@
 import { run, HandlerContext } from "@xmtp/message-kit";
-import { getFid } from "./lib/database.js";
+import { getFid, getUserBattleFrames } from "./lib/database";
 
 run(async (context: HandlerContext) => {
   const { message: { typeId } } = context;
@@ -15,18 +15,32 @@ run(async (context: HandlerContext) => {
         await context.send(`https://pokecasterv1.vercel.app/api`);
       } 
   
-      // TBD
+      // get a battle by its id
       else if (text.startsWith("/battle get")) {
         const id = text.split(" ")[2];
-        await context.send(`https://pokeframes-three.vercel.app/api/battle/${id}`);
+        await context.send(`https://pokecasterv1.vercel.app/api/battle-by-id/${id}`);
       } 
+
+      // list of battles the user is participating in
+      else if (text === "/my battles") {
+        const battles = await getUserBattleFrames(address);
+
+        if(battles.length === 0) {
+          await context.send(`You are not participating in any battles`);
+        } else {
+          await context.send(`You are participating in the following battles:`);
+          battles.forEach(async (battle: number) => {
+            await context.send(`https://pokeframes-three.vercel.app/api/battle/${battle}`);
+          });
+        }
+      }
   
       // list of commands available + short descriptions
       else if (text === "/help") {
         await context.send(`🔎 Commands below are currently available`);
         await context.send(`/battle -> sends a list of joinable battles`);
         await context.send(`/battle get <id> -> get a battle by its id and play it on the chat`);
-        await context.send(`/battle create -> creates a new battle`);
+        await context.send(`/my battles -> get frames of battles you are participating in`);
       } 
       
       // fallback in caso of unexpected text (text !== "/battle" || text !== "/help" || text !== "/battle get" || text !== "/battle create")
@@ -50,7 +64,6 @@ run(async (context: HandlerContext) => {
     } = context;
     // if (action === "added" && (emoji === "🔂" || emoji === "🔁")) {
     await context.send("Reactions not implemented yet (:");
-    
   }
 
   // handle unexpected input

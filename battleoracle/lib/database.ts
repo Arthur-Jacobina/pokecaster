@@ -1,15 +1,19 @@
 import { Battle } from "../types/types.js"
 
+const BACKEND_URL = 'http://ethonline24-production.up.railway.app/api';
+
 export const getBattleIdByStatus = async (status: string) => {
-    const response = await fetch(`http://ethonline24-production.up.railway.app/get/${status}`);
+    console.log(`${BACKEND_URL}/get/${status}`)
+
+    const response = await fetch(`${BACKEND_URL}/get/${status}`);
   
     const data = await response.json();
-  
-    return data as number[];
+
+    return data.battles as number[];
 }
 
 export const getBattleById = async (id: number) => {
-    const response = await fetch(`http://ethonline24-production.up.railway.app/battle/${id}`);
+    const response = await fetch(`${BACKEND_URL}/battle/${id}`);
   
     const data = await response.json();
   
@@ -17,7 +21,7 @@ export const getBattleById = async (id: number) => {
 }
 
 export const registerUser = async (fid: number, wallet: string) => {
-    const response = await fetch(`http://ethonline24-production.up.railway.app/register-converse-user`, {
+    const response = await fetch(`${BACKEND_URL}/register-converse-user`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
