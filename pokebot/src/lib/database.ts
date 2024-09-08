@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "../constant/config";
+import { BACKEND_URL } from "../constant/config.js";
 
 export const getFid = async (address: string) => {
   // try to get fid from database
@@ -25,4 +25,4 @@ export const getUserBattleFrames = async (address: string) => {
   const data : any = await response.json();
 
   return data.battles as number[];
-}
+} 

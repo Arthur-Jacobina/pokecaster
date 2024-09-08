@@ -1,5 +1,5 @@
 import { run, HandlerContext } from "@xmtp/message-kit";
-import { getFid, getUserBattleFrames } from "./lib/database";
+import { getFid, getUserBattleFrames } from "./lib/database.js";
 
 run(async (context: HandlerContext) => {
   const { message: { typeId } } = context;
