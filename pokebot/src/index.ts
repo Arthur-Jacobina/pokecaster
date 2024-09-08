@@ -1,10 +1,18 @@
 import { run, HandlerContext } from "@xmtp/message-kit";
+import { getFid } from "./lib/database";
 
 run(async (context: HandlerContext) => {
   const { message: { typeId } } = context;
   console.log(typeId);
   if (typeId === "text" || typeId === "reply") {
-    const { message: { content: { content: text } } } = context;
+    const { message: { content: { content: text }, sender: { username } } } = context;
+
+    const userFid = await getFid(username);
+
+    if(userFid === null) {
+      await context.send("You need to register first. Please visit the /register frame");
+      return;
+    }
 
     // list of battles with status = "waiting"
     if (text === "/battle") {
@@ -18,7 +26,7 @@ run(async (context: HandlerContext) => {
 
     // TBD
     else if (text === "/battle get") {
-      await context.send(`https://pokeframes-three.vercel.app/api`);
+      await context.send(`https://pokeframes-three.vercel.app/api/battle/:id`);
     } 
 
     // list of commands available + short descriptions
