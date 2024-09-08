@@ -5,7 +5,7 @@ import { Context, Next } from 'hono';
 import { handle } from 'frog/vercel';
 import { serve } from '@hono/node-server';
 import { validateFramesPost } from "@xmtp/frames-validator";
-import { generateBattleList } from "../image-generation/generator.js";
+// import { generateBattleList } from "../image-generation/generator.js";
 // import { getBattleById, getBattleIdByStatus } from "../lib/database.js";
 
 const title = 'battle-oracle'
@@ -60,45 +60,46 @@ app.frame("/", (c) => {
     intents: [
       <Button action={`/0`}>Battles</Button>,
       <Button action={`/`}>Share</Button>,
+      <Button action={`/subscribe/${"qlqrcoisa"}`}>Subscribe</Button>,
     ],
   });
 });
 
-app.frame("/:id", async (c) => {
-  const id = Number(c.req.param('id'));
-  // const waitingBattles = await getBattleIdByStatus('waiting');
-  // const battle = await getBattleById(waitingBattles[id]);
-  // const battlePokemons = battle.maker_pokemons;
-  const battlePokemons = [1,4,25];
-  return c.res({
-    title,
-    image: `/image/battlelist/${battlePokemons[0]}/${battlePokemons[1]}/${battlePokemons[2]}`,
-    imageAspectRatio: '1:1',
-    intents: [
-      <Button action={`/${id+1}`}>⬅️</Button>,
-      <Button action={`/`}>✅</Button>,
-      <Button action={`/${id-1}`}>➡️</Button>,
-    ],
-  });
-});
+// app.frame("/:id", async (c) => {
+//   const id = Number(c.req.param('id'));
+//   // const waitingBattles = await getBattleIdByStatus('waiting');
+//   // const battle = await getBattleById(waitingBattles[id]);
+//   // const battlePokemons = battle.maker_pokemons;
+//   const battlePokemons = [1,4,25];
+//   return c.res({
+//     title,
+//     image: `/image/battlelist/${battlePokemons[0]}/${battlePokemons[1]}/${battlePokemons[2]}`,
+//     imageAspectRatio: '1:1',
+//     intents: [
+//       <Button action={`/${id+1}`}>⬅️</Button>,
+//       <Button action={`/`}>✅</Button>,
+//       <Button action={`/${id-1}`}>➡️</Button>,
+//     ],
+//   });
+// });
 
 app.frame("/subscribe/:username", async (c) => {
-  const username = c.req.param('username');
+  // const username = c.req.param('username');
 
   return c.res({
     title,
-    image: `/bocover.png`,
+    image: `/public/bocover.png`,
     imageAspectRatio: '1:1',
     intents: [
-      <Button action={`/register/${username}`}>Sign</Button>
+      <Button action={`/register`}>Sign</Button>
     ],
   })
 })
 
-app.frame("/register/:username", async (c) => {
-  const fid = c.frameData?.fid;
+app.frame("/register", async (c) => {
+  // const fid = c.frameData?.fid;
 
-  console.log(fid);
+  // console.log(fid);
 
   return c.res({
     title,
@@ -123,9 +124,9 @@ app.frame('/finish', (c) => {
 
 app.signature("/sign", async (c) => {
   const username = 'lucasesloko';
-  const { frameData } = c;
-  const fid = frameData?.fid;
-  const timestamp = Date.now();
+  // const { frameData } = c;
+  // const fid = frameData?.fid;
+  // const timestamp = Date.now();
 
   return c.signTypedData({
     chainId: 'eip155:11155111',
@@ -144,23 +145,23 @@ app.signature("/sign", async (c) => {
   });
 })
 
-app.hono.get('/image/battlelist/:p1/:p2/:p3', async (c) => {
-  try {
-    const p1 = Number(c.req.param('p1'));
-    const p2 = Number(c.req.param('p2'));
-    const p3 = Number(c.req.param('p3'));
+// app.hono.get('/image/battlelist/:p1/:p2/:p3', async (c) => {
+//   try {
+//     const p1 = Number(c.req.param('p1'));
+//     const p2 = Number(c.req.param('p2'));
+//     const p3 = Number(c.req.param('p3'));
 
-    const image = await generateBattleList([p1,p2,p3]);
+//     const image = await generateBattleList([p1,p2,p3]);
 
-    return c.newResponse(image, 200, {
-      'Content-Type': 'image/png',
-      'Cache-Control': 'max-age=0', 
-    });
-  } catch (error) {
-    console.error("Error generating image:", error);
-    return c.newResponse("Error generating image", 500);
-  }
-});
+//     return c.newResponse(image, 200, {
+//       'Content-Type': 'image/png',
+//       'Cache-Control': 'max-age=0', 
+//     });
+//   } catch (error) {
+//     console.error("Error generating image:", error);
+//     return c.newResponse("Error generating image", 500);
+//   }
+// });
 
 if (process.env.NODE_ENV !== 'production') {
   devtools(app, { serveStatic });
