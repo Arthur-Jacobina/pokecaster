@@ -12,17 +12,13 @@ run(async (context: HandlerContext) => {
     if(fid !== null) {
       // list of battles with status = "waiting"
       if (text === "/battle") {
-        await context.send(`https://pokeframes-three.vercel.app/api`);
-      } 
-      
-      // TBD
-      else if (text === "/battle create") {
-        await context.send(`https://pokeframes-three.vercel.app/api`);
+        await context.send(`https://pokecasterv1.vercel.app/api`);
       } 
   
       // TBD
-      else if (text === "/battle get") {
-        await context.send(`https://pokeframes-three.vercel.app/api/battle/:id`);
+      else if (text.startsWith("/battle get")) {
+        const id = text.split(" ")[2];
+        await context.send(`https://pokeframes-three.vercel.app/api/battle/${id}`);
       } 
   
       // list of commands available + short descriptions

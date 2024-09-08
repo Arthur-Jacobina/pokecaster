@@ -6,7 +6,7 @@ import { handle } from 'frog/vercel';
 import { serve } from '@hono/node-server';
 import { validateFramesPost } from "@xmtp/frames-validator";
 import { generateBattleList } from "../image-generation/generator.js";
-import { registerUser } from "../lib/database.js";
+import { getBattleById, getBattleIdByStatus, registerUser } from "../lib/database.js";
 // import { getBattleById, getBattleIdByStatus } from "../lib/database.js";
 
 const title = 'battle-oracle'
@@ -54,54 +54,63 @@ app.use("/*", serveStatic({ root: "./public" }));
   // const { verifiedWalletAddress } = c?.var || {};
   // console.log("verifiedWalletAddress", verifiedWalletAddress);
 app.frame("/", async (c) => {
+  const waitingBattles = await getBattleIdByStatus('waiting');
+  const battleId = waitingBattles[0];
+
   return c.res({
     title,
     image: `/bocover.png`,
     imageAspectRatio: '1:1',
     intents: [
-      <Button action={`/0`}>Battles</Button>,
-      <Button action={`/`}>Share</Button>,
-      <Button action={`/subscribe/${"qlqrcoisa"}`}>Subscribe</Button>,
+      <Button action={`/battle/${battleId}`}>Battles</Button>,
     ],
   });
 });
 
 app.frame("/battle/:id", async (c) => {
   const id = Number(c.req.param('id'));
-  // const waitingBattles = await getBattleIdByStatus('waiting');
-  // const battle = await getBattleById(waitingBattles[id]);
-  // const battlePokemons = battle.maker_pokemons;
-  const battlePokemons = [1,4,25];
+  const battle = await getBattleById(id);
+  const battlePokemons = battle.maker_pokemons;
+
+  const waitingBattles = await getBattleIdByStatus('waiting');
+  const totalBattles = waitingBattles.length;
+
+  const getNextIndex = (currentIndex: any) => (currentIndex + 1) % totalBattles;
+  const getPreviousIndex = (currentIndex: any) => (currentIndex - 1 + totalBattles) % totalBattles;
+
+  const nextBattleId = waitingBattles[getNextIndex(id)];
+  const previousBattleId = waitingBattles[getPreviousIndex(id)];
+
   return c.res({
     title,
     image: `/image/battlelist/${battlePokemons[0]}/${battlePokemons[1]}/${battlePokemons[2]}`,
     imageAspectRatio: '1:1',
     intents: [
-      <Button action={`/${id+1}`}>⬅️</Button>,
+      <Button action={`/${nextBattleId}`}>⬅️</Button>,
       <Button action={`/`}>✅</Button>,
-      <Button action={`/${id-1}`}>➡️</Button>,
+      <Button action={`/${previousBattleId}`}>➡️</Button>,
     ],
   });
 });
 
-app.frame("/subscribe/:username", async (c) => {
-  const username = c.req.param('username');
+app.frame("/subscribe/:wallet", async (c) => {
+  const wallet = c.req.param('wallet');
 
   return c.res({
     title,
     image: `/bocover.png`,
     imageAspectRatio: '1:1',
     intents: [
-      <Button action={`/register/${username}`}>Sign</Button>
+      <Button action={`/register/${wallet}`}>Sign up</Button>
     ],
   })
 })
 
-app.frame("/register/:username", async (c) => {
-  const username = c.req.param('username');
+app.frame("/register/:wallet", async (c) => {
+  const wallet = c.req.param('wallet');
   const fid = c.frameData?.fid;
 
-  await registerUser(fid!, username);
+  await registerUser(fid!, wallet);
 
   return c.res({
     title,

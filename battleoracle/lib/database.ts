@@ -16,7 +16,7 @@ export const getBattleById = async (id: number) => {
     return data as Battle;
 }
 
-export const registerUser = async (fid: number, username: string) => {
+export const registerUser = async (fid: number, wallet: string) => {
     const response = await fetch(`http://ethonline24-production.up.railway.app/register-converse-user`, {
         method: 'POST',
         headers: {
@@ -24,7 +24,7 @@ export const registerUser = async (fid: number, username: string) => {
         },
         body: JSON.stringify({
             fid,
-            username
+            wallet
         })
     });
   
