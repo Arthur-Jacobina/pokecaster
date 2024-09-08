@@ -1,9 +1,9 @@
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Button, Frog } from "frog";
 import { devtools } from "frog/dev";
-import { Context, Next } from 'hono'
+import { Context, Next } from 'hono';
 import { handle } from 'frog/vercel';
-import { serve } from '@hono/node-server';;
+import { serve } from '@hono/node-server';
 import { validateFramesPost } from "@xmtp/frames-validator";
 import { generateBattleList } from "../image-generation/generator.js";
 // import { getBattleById, getBattleIdByStatus } from "../lib/database.js";
@@ -81,6 +81,68 @@ app.frame("/:id", async (c) => {
     ],
   });
 });
+
+app.frame("/subscribe/:username", async (c) => {
+  const username = c.req.param('username');
+
+  return c.res({
+    title,
+    image: `/bocover.png`,
+    imageAspectRatio: '1:1',
+    intents: [
+      <Button action={`/register/${username}`}>Sign</Button>
+    ],
+  })
+})
+
+app.frame("/register/:username", async (c) => {
+  const fid = c.frameData?.fid;
+
+  console.log(fid);
+
+  return c.res({
+    title,
+    image: `/public/bocover.png`,
+    imageAspectRatio: '1:1',
+    intents: [
+      <Button.Signature target="/sign">Sign</Button.Signature>
+    ],
+  });
+})
+
+app.frame('/finish', (c) => {
+  const { transactionId } = c
+  return c.res({
+    image: (
+      <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
+        Signature: {transactionId}
+      </div>
+    )
+  })
+})
+
+app.signature("/sign", async (c) => {
+  const username = 'lucasesloko';
+  const { frameData } = c;
+  const fid = frameData?.fid;
+  const timestamp = Date.now();
+
+  return c.signTypedData({
+    chainId: 'eip155:11155111',
+    domain: {
+      name: 'Pokeframes'
+    },
+    types: {
+      Register: [
+        { name: 'username', type: 'string' },
+      ]
+    },
+    primaryType: 'Register',
+    message: {
+      username
+    }
+  });
+})
 
 app.hono.get('/image/battlelist/:p1/:p2/:p3', async (c) => {
   try {
