@@ -55,7 +55,7 @@ app.use("/*", serveStatic({ root: "./public" }));
 app.frame("/", (c) => {
   return c.res({
     title,
-    image: `/public/bocover.png`,
+    image: `/bocover.png`,
     imageAspectRatio: '1:1',
     intents: [
       <Button action={`/0`}>Battles</Button>,
@@ -88,7 +88,7 @@ app.frame("/subscribe/:username", async (c) => {
 
   return c.res({
     title,
-    image: `/public/bocover.png`,
+    image: `/bocover.png`,
     imageAspectRatio: '1:1',
     intents: [
       <Button action={`/register`}>Sign</Button>
@@ -103,7 +103,7 @@ app.frame("/register", async (c) => {
 
   return c.res({
     title,
-    image: `/public/bocover.png`,
+    image: `/bocover.png`,
     imageAspectRatio: '1:1',
     intents: [
       <Button.Signature target="/sign">Sign</Button.Signature>
