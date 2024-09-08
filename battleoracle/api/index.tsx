@@ -5,7 +5,7 @@ import { Context, Next } from 'hono';
 import { handle } from 'frog/vercel';
 import { serve } from '@hono/node-server';
 import { validateFramesPost } from "@xmtp/frames-validator";
-// import { generateBattleList } from "../image-generation/generator.js";
+import { generateBattleList } from "../image-generation/generator.js";
 // import { getBattleById, getBattleIdByStatus } from "../lib/database.js";
 
 const title = 'battle-oracle'
@@ -52,7 +52,7 @@ app.use("/*", serveStatic({ root: "./public" }));
   // XMTP verified address
   // const { verifiedWalletAddress } = c?.var || {};
   // console.log("verifiedWalletAddress", verifiedWalletAddress);
-app.frame("/", (c) => {
+app.frame("/", async (c) => {
   return c.res({
     title,
     image: `/bocover.png`,
@@ -65,23 +65,23 @@ app.frame("/", (c) => {
   });
 });
 
-// app.frame("/:id", async (c) => {
-//   const id = Number(c.req.param('id'));
-//   // const waitingBattles = await getBattleIdByStatus('waiting');
-//   // const battle = await getBattleById(waitingBattles[id]);
-//   // const battlePokemons = battle.maker_pokemons;
-//   const battlePokemons = [1,4,25];
-//   return c.res({
-//     title,
-//     image: `/image/battlelist/${battlePokemons[0]}/${battlePokemons[1]}/${battlePokemons[2]}`,
-//     imageAspectRatio: '1:1',
-//     intents: [
-//       <Button action={`/${id+1}`}>⬅️</Button>,
-//       <Button action={`/`}>✅</Button>,
-//       <Button action={`/${id-1}`}>➡️</Button>,
-//     ],
-//   });
-// });
+app.frame("/battle/:id", async (c) => {
+  const id = Number(c.req.param('id'));
+  // const waitingBattles = await getBattleIdByStatus('waiting');
+  // const battle = await getBattleById(waitingBattles[id]);
+  // const battlePokemons = battle.maker_pokemons;
+  const battlePokemons = [1,4,25];
+  return c.res({
+    title,
+    image: `/image/battlelist/${battlePokemons[0]}/${battlePokemons[1]}/${battlePokemons[2]}`,
+    imageAspectRatio: '1:1',
+    intents: [
+      <Button action={`/${id+1}`}>⬅️</Button>,
+      <Button action={`/`}>✅</Button>,
+      <Button action={`/${id-1}`}>➡️</Button>,
+    ],
+  });
+});
 
 app.frame("/subscribe/:username", async (c) => {
   // const username = c.req.param('username');
@@ -96,23 +96,22 @@ app.frame("/subscribe/:username", async (c) => {
   })
 })
 
-app.frame("/register", async (c) => {
-  // const fid = c.frameData?.fid;
-
-  // console.log(fid);
+app.frame("/register/:username", async (c) => {
+  const username = c.req.param('username');
 
   return c.res({
     title,
     image: `/bocover.png`,
     imageAspectRatio: '1:1',
     intents: [
-      <Button.Signature target="/sign">Sign</Button.Signature>
+      <Button.Signature target={`/sign/${username}`}>Sign</Button.Signature>
     ],
   });
 })
 
 app.frame('/finish', (c) => {
   const { transactionId } = c
+
   return c.res({
     image: (
       <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
@@ -122,27 +121,31 @@ app.frame('/finish', (c) => {
   })
 })
 
-app.signature("/sign", async (c) => {
-  const username = 'lucasesloko';
-  // const { frameData } = c;
-  // const fid = frameData?.fid;
-  // const timestamp = Date.now();
+app.signature('/sign/:username', (c) => {
+  const username = c.req.param('username');
+  const fid = c.frameData?.fid;
 
+  const timestamp = Date.now();
+  
   return c.signTypedData({
     chainId: 'eip155:11155111',
     domain: {
-      name: 'Pokeframes'
+      name: 'Pokeframes',
     },
     types: {
       Register: [
+        { name: 'fid', type: 'uint256' },
         { name: 'username', type: 'string' },
+        { name: 'timestamp', type: 'uint256' },
       ]
     },
     primaryType: 'Register',
     message: {
-      username
+      fid: BigInt(fid!),
+      username: username,
+      timestamp: BigInt(timestamp)
     }
-  });
+  })
 })
 
 // app.hono.get('/image/battlelist/:p1/:p2/:p3', async (c) => {
